@@ -213,7 +213,7 @@ td code,p code,li code,dd code{overflow-wrap:anywhere}td,th{overflow-wrap:anywhe
     <li>
       <div class="sh"><span class="n">0</span><h3>Get a server</h3><span class="where">your computer</span><span class="dur">~3 min</span></div>
       <div class="os"><div class="ostabs" role="tablist"><button type="button" data-os="unix" role="tab">Mac / Linux</button><button type="button" data-os="win" role="tab">Windows</button></div><pre data-os="unix"><code>curl -fsSL https://raw.githubusercontent.com/townhall-fc/townhall/main/install/provision.sh | HCLOUD_TOKEN=your_token bash</code></pre><pre data-os="win"><code>$env:HCLOUD_TOKEN="your_token"; irm https://raw.githubusercontent.com/townhall-fc/townhall/main/install/provision.ps1 | iex</code></pre></div>
-      <p>Creates a Hetzner server with a 1 TB disk and prints its IP. You need a <a href="#before">Hetzner API token</a>.</p>
+      <p>Creates a Hetzner server with a 2 TB volume (1 TB where Hetzner limits new accounts) and prints its IP. You need a <a href="#before">Hetzner API token</a>.</p>
     </li>
     <li>
       <div class="sh"><span class="n">1</span><h3>Start the node</h3><span class="where">on the server</span><span class="dur">~2 min, then syncs overnight</span></div>
@@ -223,7 +223,7 @@ td code,p code,li code,dd code{overflow-wrap:anywhere}td,th{overflow-wrap:anywhe
     <li>
       <div class="sh"><span class="n">2</span><h3>Open your client</h3><span class="where">on the server</span><span class="dur">~3 min</span></div>
       <pre><code>ssh root@YOUR_IP 'curl -fsSL https://raw.githubusercontent.com/townhall-fc/townhall/main/install/client.sh | bash'</code></pre>
-      <p>Builds the client from this repo and serves it over HTTPS. Open the address it prints.</p>
+      <p>Builds the client from this repo and serves it over HTTPS. Open the address it prints: you can read right away; connect your account to post once the client shows your node in sync.</p>
     </li>
   </ol>
   <div class="timeline" aria-label="Timeline of the demo node">
@@ -231,7 +231,7 @@ td code,p code,li code,dd code{overflow-wrap:anywhere}td,th{overflow-wrap:anywhe
     <div class="bar"><span style="flex:11">snapshot · ~11 h</span><span style="flex:10">catching up · ~10 h</span></div>
     <div><b>Tomorrow</b><span>in sync, post from your node</span></div>
   </div>
-  <p class="small">Measured on the <a href="https://app.townhallfc.xyz">demo node</a>, October 2026. Already have a server (Ubuntu, 4 vCPU, 16 GB RAM, 1 TB disk)? Skip step 0. Done testing? <a href="#cost">One command deletes everything.</a> On Windows, use PowerShell (not cmd) for all three.</p>
+  <p class="small">Measured on the <a href="https://app.townhallfc.xyz">demo node</a>, October 2026. Already have a server (Ubuntu 22.04/24.04, 4 vCPU, 16 GB RAM, 1 TB disk, open ports TCP 22, 80, 443 and UDP 3382)? Skip step 0. Done testing? <a href="#cost">One command deletes everything.</a> On Windows, use PowerShell (not cmd) for all three.</p>
 </section>
 
 
@@ -334,9 +334,9 @@ In sync when every 'blocks behind' is in the single digits.</code></pre>
 <p>Type your username. The client resolves it to your FID on your node, loads who you follow, and builds your feed from their latest casts. Nothing is signed and nothing is sent anywhere.</p>
 <h3>Connect your account (to post)</h3>
 <ol class="steps">
-  <li><b>Paste your recovery phrase and press Check.</b> The page derives your custody address from the phrase and reads your FID from the IdRegistry contract on Optimism. Nothing is sent yet.</li>
-  <li><b>Press Add app key.</b> The page generates a new Ed25519 keypair (your app key) and reads your current key nonce from your node (<code>/v1/signersByFid</code> → <code>currentUserNonce</code>). Your custody account then signs two EIP-712 messages: a <i>SignedKeyRequest</i> (which app asks for the key, here your own FID) and a <i>KeyAdd</i> (the key, what it may sign, how long it lives, the next nonce).</li>
-  <li><b>It goes to your node as a message.</b> Both signatures ride in a <code>KEY_ADD</code> message whose envelope is signed by the new key itself, proof that you hold it. Your node checks it and relays it like a cast. About a second later the key is active. The page clears the phrase and keeps only the app key in this browser.</li>
+  <li><b>Paste your recovery phrase and press Connect.</b> The page derives your custody address from the phrase and reads your FID from the IdRegistry contract on Optimism. Nothing is sent yet.</li>
+  <li><b>It makes this client a key.</b> The page generates a new Ed25519 keypair (your app key) and reads your current key nonce from your node (<code>/v1/signersByFid</code> → <code>currentUserNonce</code>). Your custody account then signs two EIP-712 messages: a <i>SignedKeyRequest</i> (which app asks for the key, here your own FID) and a <i>KeyAdd</i> (the key, what it may sign, how long it lives, the next nonce).</li>
+  <li><b>It goes to your node as a message.</b> Both signatures ride in a <code>KEY_ADD</code> message whose envelope is signed by the new key itself, proof that you hold it. Your node checks it and relays it like a cast. About ten seconds later the key is active. The page clears the phrase and keeps only the app key in this browser.</li>
 </ol>
 <h3>Post, reply, like, recast, follow</h3>
 <p>Each action builds a protocol message, signs it with your app key in the browser, and submits the raw bytes to your node. Mentions like <code>@alice</code> are resolved on your node and stored as protocol mentions.</p>
@@ -441,13 +441,13 @@ In sync when every 'blocks behind' is in the single digits.</code></pre>
   <dd>The phrase does not leave your browser, but two risks are real. Whoever serves the page could change its code: on your own node that is you, building from this open repository; on someone else's townhall it is them. And a compromised computer or a malicious browser extension can read anything you type. That is why the advice is a test account, or <a href="#signin">sign-in through the Farcaster app</a>, where no phrase is typed at all.</dd>
 
   <dt>Which account should I use?</dt>
-  <dd>Inside the client, a spare account that has storage: it is the account whose phrase you paste. If you are testing this tutorial for someone, post your report from your main account; your name is what makes the report count.</dd>
+  <dd>Inside the client, a spare account that has storage: it is the account whose phrase you paste. If you are testing this tutorial for someone, post your report from the account you normally use, so people can see who ran it.</dd>
 
   <dt>What can the app key do if someone gets it?</dt>
   <dd>Sign casts, reactions, follows and profile changes for that account, until you revoke it (Settings → Revoke) or it expires after 90 days unused. It cannot move your FID, change your custody address or add other keys.</dd>
 
   <dt>Does everyone need their own server?</dt>
-  <dd>No. One node serves a whole community: people open a townhall and sign in, without running anything. The three commands are for people who want their own copy: communities, developers, anyone who should not depend on one operator. That any of them can is what keeps a single app from deciding who gets heard.</dd>
+  <dd>No. One node serves a whole community: people open a townhall and sign in, without running anything. The three commands are for people who want their own copy: communities, developers, anyone who should not depend on one operator.</dd>
 
   <dt>Why 1 TB when the Snapchain docs say 2 TB?</dt>
   <dd>The network itself is about 560 GB. The extra space is for the first sync, when the node keeps every downloaded snapshot file until the end; the <a href="#step1">snapshot guard</a> deletes each one as soon as it is used, so the demo node peaked at about 800 GB. If you keep the node for months, grow the disk as the network grows.</dd>
@@ -466,7 +466,7 @@ In sync when every 'blocks behind' is in the single digits.</code></pre>
   <tr><td>"blocks behind" keeps growing</td><td>The network was upgraded and your node runs an older Snapchain. Run step 1 again: it pulls the latest release and restarts the node, which then catches up.</td></tr>
   <tr><td>"blocks behind" stays high for hours</td><td>Check UDP 3382 is open in your firewall and the disk is not full (<code>df -h</code>).</td></tr>
   <tr><td>The client address doesn't load over HTTPS</td><td>Ports 80 and 443 must be open for the certificate. If sslip.io is rate limited, point your own domain at the IP and re-run step 2 with <code>DOMAIN=your.domain</code>.</td></tr>
-  <tr><td>"nonce is not greater than stored nonce"</td><td>Another key was added or removed for your FID in the meantime. Press Add app key again; it re-reads the nonce.</td></tr>
+  <tr><td>"nonce is not greater than stored nonce"</td><td>Another key was added or removed for your FID in the meantime. Press Connect again; it re-reads the nonce.</td></tr>
   <tr><td>Casts rejected after adding a key</td><td>Your FID may have no storage. Check <code>/v1/storageLimitsByFid?fid=YOUR_FID</code> on your node.</td></tr>
   <tr><td>"invalid signer" when posting</td><td>Your node hasn't processed the key event yet, usually because it is still syncing. Wait until it is in sync.</td></tr>
   <tr><td>"volumes size limit exceeded" in step 0</td><td>New Hetzner accounts have a cap on total volume size. Step 0 then attaches the largest volume allowed and tells you. To grow it later, request a higher limit in the Hetzner console (Limits) and resize the volume.</td></tr>

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Guide: button names match the client (Connect), key activation "about ten seconds", connect to post once the node is in sync, ports listed for your own server, step 0 states the 2 TB / 1 TB volume. Step 1 warns below 900 GB free instead of 1500.
 - A 59-second vertical video on the guide, in English and Chinese (`site/video/`), linked from the README.
 - Fix: casts over 320 bytes failed with "text > 320 bytes". They now go out as long casts (up to 1024 bytes), as the protocol requires.
 - Images and video: attach up to two to a cast. They upload to your own server (`/api/upload`, stored in `/opt/townhall/media`, served at `/media/`), and the cast carries the URL as an embed. Uploads need a signature from an app key your node lists as active; the server checks the file's real type from its bytes. `UPLOAD_FIDS` and `MEDIA_QUOTA_GB` (default 20) on step 2. Videos in casts play in the client, and the Farcaster app's own streams play where the browser supports HLS.

@@ -15,7 +15,7 @@
 #   SSH_PUBKEY_FILE     default: ~/.ssh/id_ed25519.pub (created if missing)
 #   NAME                default: townhall
 #
-# Already have a server (any provider, Ubuntu 22.04/24.04, 4 vCPU, 16 GB RAM, 2 TB disk,
+# Already have a server (any provider, Ubuntu 22.04/24.04, 4 vCPU, 16 GB RAM, 1 TB disk,
 # ports 22/80/443 TCP and 3382 UDP open)? Skip this step and go to step 1.
 set -euo pipefail
 

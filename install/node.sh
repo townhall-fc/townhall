@@ -24,11 +24,11 @@ if ! command -v docker >/dev/null 2>&1; then
 fi
 command -v jq >/dev/null 2>&1 || { $SUDO apt-get update -qq && $SUDO apt-get install -y -qq jq >/dev/null; }
 
-# 2. Where the data goes: the mount with the most free space (the 2 TB volume)
+# 2. Where the data goes: the mount with the most free space (the volume)
 DATA_DIR="${DATA_DIR:-$(df -B1G --output=avail,target -x tmpfs -x devtmpfs -x overlay | tail -n +2 | sort -rn | head -1 | awk '{print $2}')}"
 FREE_GB=$(df -B1G --output=avail "$DATA_DIR" | tail -1 | tr -d ' ')
 say "Data directory: $DATA_DIR ($FREE_GB GB free)"
-[ "$FREE_GB" -ge 1500 ] || echo "  ! Snapchain needs about 2 TB. You have $FREE_GB GB free here; the sync may run out of space."
+[ "$FREE_GB" -ge 900 ] || echo "  ! The sync peaks at about 800 GB while it unpacks the snapshot (about 560 GB once synced). You have $FREE_GB GB free here; it may run out of space."
 
 NODE_DIR="$DATA_DIR/snapchain"
 $SUDO mkdir -p "$NODE_DIR"

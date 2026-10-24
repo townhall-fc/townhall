@@ -675,7 +675,7 @@ function viewSetup() {
     route();
   });
 
-  // Write: seed phrase -> app key via one Optimism transaction (self-hosted only)
+  // Write: seed phrase -> app key with a gasless KEY_ADD message, no transaction (self-hosted only)
   const w = h(`
     <section class="option">
       <h2>Your keys</h2>

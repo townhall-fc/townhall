@@ -214,7 +214,7 @@ td code,p code,li code,dd code{overflow-wrap:anywhere}td,th{overflow-wrap:anywhe
     <li>
       <div class="sh"><span class="n">0</span><h3>准备服务器</h3><span class="where">在你的电脑上</span><span class="dur">约 3 分钟</span></div>
       <div class="os"><div class="ostabs" role="tablist"><button type="button" data-os="unix" role="tab">Mac / Linux</button><button type="button" data-os="win" role="tab">Windows</button></div><pre data-os="unix"><code>curl -fsSL https://raw.githubusercontent.com/townhall-fc/townhall/main/install/provision.sh | HCLOUD_TOKEN=your_token bash</code></pre><pre data-os="win"><code>$env:HCLOUD_TOKEN="your_token"; irm https://raw.githubusercontent.com/townhall-fc/townhall/main/install/provision.ps1 | iex</code></pre></div>
-      <p>在 Hetzner 上创建一台带 1 TB 磁盘的服务器，并打印它的 IP。你需要一个 <a href="#before">Hetzner API 令牌</a>。</p>
+      <p>在 Hetzner 上创建一台服务器并挂载 2 TB 数据卷（Hetzner 限制新账户时为 1 TB），并打印它的 IP。你需要一个 <a href="#before">Hetzner API 令牌</a>。</p>
     </li>
     <li>
       <div class="sh"><span class="n">1</span><h3>启动节点</h3><span class="where">在服务器上</span><span class="dur">约 2 分钟，之后通宵同步</span></div>
@@ -224,7 +224,7 @@ td code,p code,li code,dd code{overflow-wrap:anywhere}td,th{overflow-wrap:anywhe
     <li>
       <div class="sh"><span class="n">2</span><h3>打开你的客户端</h3><span class="where">在服务器上</span><span class="dur">约 3 分钟</span></div>
       <pre><code>ssh root@YOUR_IP 'curl -fsSL https://raw.githubusercontent.com/townhall-fc/townhall/main/install/client.sh | bash'</code></pre>
-      <p>从本仓库源码构建客户端，并通过 HTTPS 提供服务。打开它打印出的地址即可。</p>
+      <p>从本仓库源码构建客户端，并通过 HTTPS 提供服务。打开它打印出的地址：马上就能阅读；等客户端显示节点已同步后，再连接账号发帖。</p>
     </li>
   </ol>
   <div class="timeline" aria-label="演示节点的时间线">
@@ -232,7 +232,7 @@ td code,p code,li code,dd code{overflow-wrap:anywhere}td,th{overflow-wrap:anywhe
     <div class="bar"><span style="flex:11">快照 · 约 11 小时</span><span style="flex:10">追块 · 约 10 小时</span></div>
     <div><b>明天</b><span>同步完成，从你的节点发帖</span></div>
   </div>
-  <p class="small">数据来自 2026 年 10 月的<a href="https://app.townhallfc.xyz">演示节点</a>。已经有服务器（Ubuntu、4 vCPU、16 GB 内存、1 TB 磁盘）？跳过第 0 步。测试完了？<a href="#cost">一条命令删除全部资源。</a> Windows 上请用 PowerShell（不要用 cmd）运行这三条命令。</p>
+  <p class="small">数据来自 2026 年 10 月的<a href="https://app.townhallfc.xyz">演示节点</a>。已经有服务器（Ubuntu 22.04/24.04、4 vCPU、16 GB 内存、1 TB 磁盘，开放 TCP 22、80、443 和 UDP 3382 端口）？跳过第 0 步。测试完了？<a href="#cost">一条命令删除全部资源。</a> Windows 上请用 PowerShell（不要用 cmd）运行这三条命令。</p>
 </section>
 
 
@@ -335,9 +335,9 @@ In sync when every 'blocks behind' is in the single digits.</code></pre>
 <p>输入你的用户名。客户端在你的节点上把它解析成 FID，加载你关注的人，用他们最新的 cast 组成信息流。不签名，也不向任何地方发送任何东西。</p>
 <h3>连接你的账号（用于发帖）</h3>
 <ol class="steps">
-  <li><b>粘贴助记词并点击 Check。</b>页面从助记词推导出你的托管地址（custody address），并从 Optimism 上的 IdRegistry 合约读取你的 FID。此时什么都不会发送。</li>
-  <li><b>点击 Add app key。</b>页面生成一对新的 Ed25519 密钥（你的应用密钥），并从你的节点读取当前密钥 nonce（<code>/v1/signersByFid</code> → <code>currentUserNonce</code>）。然后你的托管账户签署两条 EIP-712 消息：<i>SignedKeyRequest</i>（哪个应用请求该密钥，这里是你自己的 FID）和 <i>KeyAdd</i>（密钥本身、可签署的消息类型、有效期、下一个 nonce）。</li>
-  <li><b>它作为一条消息发送到你的节点。</b>两个签名都放在一条 <code>KEY_ADD</code> 消息里，而这条消息的外层由新密钥本身签名，以证明你持有它。你的节点校验后像转发 cast 一样转发它。大约一秒后密钥生效。页面清除助记词，只在本浏览器中保留应用密钥。</li>
+  <li><b>粘贴助记词并点击 Connect。</b>页面从助记词推导出你的托管地址（custody address），并从 Optimism 上的 IdRegistry 合约读取你的 FID。此时什么都不会发送。</li>
+  <li><b>页面为这个客户端生成密钥。</b>页面生成一对新的 Ed25519 密钥（你的应用密钥），并从你的节点读取当前密钥 nonce（<code>/v1/signersByFid</code> → <code>currentUserNonce</code>）。然后你的托管账户签署两条 EIP-712 消息：<i>SignedKeyRequest</i>（哪个应用请求该密钥，这里是你自己的 FID）和 <i>KeyAdd</i>（密钥本身、可签署的消息类型、有效期、下一个 nonce）。</li>
+  <li><b>它作为一条消息发送到你的节点。</b>两个签名都放在一条 <code>KEY_ADD</code> 消息里，而这条消息的外层由新密钥本身签名，以证明你持有它。你的节点校验后像转发 cast 一样转发它。大约十秒后密钥生效。页面清除助记词，只在本浏览器中保留应用密钥。</li>
 </ol>
 <h3>发帖、回复、点赞、转发、关注</h3>
 <p>每个操作都会构建一条协议消息，在浏览器里用你的应用密钥签名，再把原始字节提交给你的节点。像 <code>@alice</code> 这样的提及会在你的节点上解析，并作为协议级提及保存。</p>
@@ -439,7 +439,7 @@ In sync when every 'blocks behind' is in the single digits.</code></pre>
   <dd>助记词不会离开浏览器，但有两个真实风险。提供页面的人可以改它的代码：在你自己的节点上就是你自己，从这个开源仓库构建；在别人的 townhall 上就是对方。另外，被入侵的电脑或恶意浏览器扩展能读到你输入的任何内容。所以建议用测试账号，或者<a href="#signin">通过 Farcaster 应用登录</a>，那样完全不用输入助记词。</dd>
 
   <dt>应该用哪个账号？</dt>
-  <dd>在客户端里用一个有存储空间的备用账号：你粘贴的就是它的助记词。如果你在帮别人测试这个教程，请用你的主账号发布测试报告：报告的分量来自你的名字。</dd>
+  <dd>在客户端里用一个有存储空间的备用账号：你粘贴的就是它的助记词。如果你在帮别人测试这个教程，请用你平时使用的账号发布测试报告，让大家知道是谁运行的。</dd>
 
   <dt>如果有人拿到了应用密钥，能做什么？</dt>
   <dd>以该账号签署 cast、反应、关注和资料修改，直到你撤销它（设置 → Revoke），或者 90 天不用后自动过期。它不能转移你的 FID、更改 custody 地址或添加其他密钥。</dd>
@@ -464,7 +464,7 @@ In sync when every 'blocks behind' is in the single digits.</code></pre>
   <tr><td>“blocks behind” 不断增加</td><td>网络已经升级，而你的节点还在运行旧版 Snapchain。重新运行第 1 步：它会拉取最新版本并重启节点，之后节点会自己追上。</td></tr>
   <tr><td>“blocks behind” 几个小时都不降</td><td>检查防火墙是否开放了 UDP 3382，以及磁盘是否已满（<code>df -h</code>）。</td></tr>
   <tr><td>客户端地址无法通过 HTTPS 打开</td><td>申请证书需要开放 80 和 443 端口。如果 sslip.io 被限流，把你自己的域名指向这个 IP，并用 <code>DOMAIN=your.domain</code> 重新运行第 2 步。</td></tr>
-  <tr><td>“nonce is not greater than stored nonce”</td><td>期间你的 FID 又添加或移除了别的密钥。再点一次 Add app key，它会重新读取 nonce。</td></tr>
+  <tr><td>“nonce is not greater than stored nonce”</td><td>期间你的 FID 又添加或移除了别的密钥。再点一次 Connect，它会重新读取 nonce。</td></tr>
   <tr><td>添加密钥后 cast 被拒</td><td>你的 FID 可能没有存储。在你的节点上查看 <code>/v1/storageLimitsByFid?fid=YOUR_FID</code>。</td></tr>
   <tr><td>发帖时 “invalid signer”</td><td>你的节点还没处理到这个密钥事件，通常是因为还在同步。等同步完成。</td></tr>
   <tr><td>第 0 步报 “volumes size limit exceeded”</td><td>新的 Hetzner 账号有卷总量上限。第 0 步会挂载允许的最大卷并提示你。以后要扩容，在 Hetzner 控制台（Limits）申请提额后调整卷大小。</td></tr>
