@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fix: if the snapshot download broke off (a chunk failing 6 times in a row), Snapchain restarted, skipped the snapshot and synced the missing shards from block 0, which takes weeks. The snapshot guard now detects the restart and starts the download over (up to 5 times). `townhall-status` flags a shard that missed its snapshot, and `townhall-resync` starts the first sync over.
 - Guide: button names match the client (Connect), key activation "about ten seconds", connect to post once the node is in sync, ports listed for your own server, step 0 states the 2 TB / 1 TB volume. Step 1 warns below 900 GB free instead of 1500.
 - A 59-second vertical video on the guide, in English and Chinese (`site/video/`), linked from the README.
 - Fix: casts over 320 bytes failed with "text > 320 bytes". They now go out as long casts (up to 1024 bytes), as the protocol requires.

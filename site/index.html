@@ -463,6 +463,7 @@ In sync when every 'blocks behind' is in the single digits.</code></pre>
 <table>
   <tr><th>You see</th><th>Do this</th></tr>
   <tr><td>"node unreachable" in the client</td><td>The node is still downloading the snapshot. <code>townhall-status</code> and the node logs show progress.</td></tr>
+  <tr><td>One shard is about 50 million blocks behind and its height is tiny</td><td>The snapshot download broke off (a chunk kept failing) and that shard is syncing from block 0, which takes weeks. <code>townhall-status</code> says so. Run <code>townhall-resync</code> on the server: it wipes the node's data and downloads the network again, about a day. Since this release the snapshot guard restarts a broken download by itself.</td></tr>
   <tr><td>"blocks behind" keeps growing</td><td>The network was upgraded and your node runs an older Snapchain. Run step 1 again: it pulls the latest release and restarts the node, which then catches up.</td></tr>
   <tr><td>"blocks behind" stays high for hours</td><td>Check UDP 3382 is open in your firewall and the disk is not full (<code>df -h</code>).</td></tr>
   <tr><td>The client address doesn't load over HTTPS</td><td>Ports 80 and 443 must be open for the certificate. If sslip.io is rate limited, point your own domain at the IP and re-run step 2 with <code>DOMAIN=your.domain</code>.</td></tr>

@@ -75,11 +75,35 @@ if ! curl -fsS localhost:3381/v1/info >/dev/null 2>&1; then
   echo "Node API not up yet. Still downloading/unpacking the snapshot? Logs: docker compose -f NODE_DIR/docker-compose.yml logs --tail 20 snapchain"
   exit 1
 fi
-curl -fsS localhost:3381/v1/info | jq -r '"node version: \(.version // "?")", (.shardInfos[] | "shard \(.shardId): height \(.maxHeight)  blocks behind: \(.blockDelay)")'
+I=$(curl -fsS localhost:3381/v1/info)
+echo "$I" | jq -r '"node version: \(.version // "?")", (.shardInfos[] | "shard \(.shardId): height \(.maxHeight)  blocks behind: \(.blockDelay)")'
 echo "In sync when every 'blocks behind' is in the single digits."
+# A shard far below the others never got its snapshot (the download broke off) and is
+# syncing from block 0, which takes weeks.
+LOW=$(echo "$I" | jq -r '[.shardInfos[].maxHeight] as $h | ($h | max) as $m | if $m > 1000000 then (.shardInfos[] | select(.maxHeight < $m / 100) | .shardId) else empty end' | tr '\n' ' ')
+if [ -n "$LOW" ]; then
+  echo
+  echo "! Shard(s) $LOW did not get the snapshot and are syncing from block 0 (weeks)."
+  echo "  Usually the download broke off. Start it over (about a day): townhall-resync"
+fi
 EOS
 $SUDO sed -i "s#NODE_DIR#$NODE_DIR#" /usr/local/bin/townhall-status
 $SUDO chmod +x /usr/local/bin/townhall-status
+
+# Start the first sync over: wipes the node's database and downloads the snapshot again.
+$SUDO tee /usr/local/bin/townhall-resync >/dev/null <<'EOS'
+#!/usr/bin/env bash
+set -euo pipefail
+D=NODE_DIR
+read -r -p "This deletes the node's data in $D and downloads the network again (about a day). Type yes: " OK </dev/tty
+[ "$OK" = yes ] || { echo "Nothing changed."; exit 0; }
+systemctl stop townhall-snapshot-guard >/dev/null 2>&1 || true
+docker compose -f "$D/docker-compose.yml" stop snapchain
+rm -rf "$D/.rocks" "$D/.rocks.snapshot"
+curl -fsSL https://raw.githubusercontent.com/townhall-fc/townhall/main/install/node.sh | DATA_DIR="${D%/snapchain}" bash
+EOS
+$SUDO sed -i "s#NODE_DIR#$NODE_DIR#" /usr/local/bin/townhall-resync
+$SUDO chmod +x /usr/local/bin/townhall-resync
 
 cat <<EOF
 

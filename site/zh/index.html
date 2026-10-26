@@ -461,6 +461,7 @@ In sync when every 'blocks behind' is in the single digits.</code></pre>
 <table>
   <tr><th>你看到</th><th>这样做</th></tr>
   <tr><td>客户端显示 “node unreachable”</td><td>节点还在下载快照。<code>townhall-status</code> 和节点日志会显示进度。</td></tr>
+  <tr><td>某个分片落后约 5000 万个区块，高度很低</td><td>快照下载中途中断（某个分块反复失败），该分片正从第 0 个区块开始同步，需要数周。<code>townhall-status</code> 会提示这种情况。在服务器上运行 <code>townhall-resync</code>：它会清除节点数据并重新下载网络，大约一天。从这个版本起，快照守护程序会自动重新开始中断的下载。</td></tr>
   <tr><td>“blocks behind” 不断增加</td><td>网络已经升级，而你的节点还在运行旧版 Snapchain。重新运行第 1 步：它会拉取最新版本并重启节点，之后节点会自己追上。</td></tr>
   <tr><td>“blocks behind” 几个小时都不降</td><td>检查防火墙是否开放了 UDP 3382，以及磁盘是否已满（<code>df -h</code>）。</td></tr>
   <tr><td>客户端地址无法通过 HTTPS 打开</td><td>申请证书需要开放 80 和 443 端口。如果 sslip.io 被限流，把你自己的域名指向这个 IP，并用 <code>DOMAIN=your.domain</code> 重新运行第 2 步。</td></tr>
