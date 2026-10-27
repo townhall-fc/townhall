@@ -5,7 +5,7 @@
 Your own Farcaster client and Snapchain read node, in three commands. No API keys from anyone.
 
 - **Tutorial:** https://townhallfc.xyz ([中文](https://townhallfc.xyz/zh/))
-- **Live demo:** https://app.townhallfc.xyz (the author's node and client, built from this repo)
+- **Demo video:** https://townhallfc.xyz/#video (59 seconds: the three commands, the sync, the client on your own node)
 - **License:** MIT
 
 ## Quickstart
